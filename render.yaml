@@ -5,7 +5,9 @@ services:
     buildCommand: |
       chmod +x setup.sh
       ./setup.sh
-    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: |
+      source .venv/bin/activate
+      python -m uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.9.18"

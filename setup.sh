@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Activate Render's virtual environment
+source .venv/bin/activate
+
 # Install Python dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
