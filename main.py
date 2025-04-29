@@ -4,9 +4,13 @@ from typing import List, Dict, Any
 import uvicorn
 from lab_processor import LabReportProcessor
 import logging
+import os
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Lab Report Processing API")
@@ -23,18 +27,16 @@ lab_processor = LabReportProcessor()
 
 @app.get("/healthz")
 async def health_check():
+    logger.info("Health check endpoint called")
     return {"status": "healthy"}
 
 @app.post("/get-lab-tests")
 async def process_lab_report(file: UploadFile = File(...)) -> Dict[str, Any]:
-
     try:
         logger.debug(f"Received file: {file.filename}")
-        # Read the uploaded file
         contents = await file.read()
         logger.debug(f"File size: {len(contents)} bytes")
         
-        # Process the lab report
         result = lab_processor.process_report(contents)
         logger.debug(f"Processing result: {result}")
         
@@ -51,7 +53,16 @@ async def process_lab_report(file: UploadFile = File(...)) -> Dict[str, Any]:
 
 @app.get("/")
 async def root():
+    logger.info("Root endpoint called")
     return {"message": "Lab Report Processing API is running. Use POST /get-lab-tests to process lab reports."}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True) 
+    port = int(os.getenv("PORT", 8000))
+    logger.info(f"Starting server on port {port}")
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=port,
+        log_level="debug",
+        reload=False
+    ) 
