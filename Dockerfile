@@ -1,6 +1,13 @@
-FROM jitesoft/tesseract:latest as tesseract
+FROM jitesoft/tesseract:4.1.1 as tesseract
 
 FROM python:3.9-slim
+
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy Tesseract from the pre-built image
 COPY --from=tesseract /usr/bin/tesseract /usr/bin/tesseract

@@ -10,4 +10,7 @@ services:
         value: "/usr/bin/tesseract"
     plan: free
     healthCheckPath: /
-    autoDeploy: true 
+    autoDeploy: true
+    buildCommand: |
+      docker build -t lab-report-processor .
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000 
