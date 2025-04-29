@@ -1,11 +1,7 @@
-FROM python:3.9-slim
+# Build stage
+FROM python:3.9-slim as builder
 
-# Create necessary directories first
-RUN mkdir -p /var/lib/apt/lists/partial && \
-    mkdir -p /var/cache/apt/archives/partial && \
-    mkdir -p /var/cache/apt/archives
-
-# Install system dependencies
+# Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     tesseract-ocr \
@@ -21,7 +17,22 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# Final stage
+FROM python:3.9-slim
+
+# Copy Tesseract and dependencies from builder
+COPY --from=builder /usr/bin/tesseract /usr/bin/tesseract
+COPY --from=builder /usr/share/tesseract-ocr /usr/share/tesseract-ocr
+COPY --from=builder /usr/lib/x86_64-linux-gnu/libtesseract.so.4 /usr/lib/x86_64-linux-gnu/libtesseract.so.4
+COPY --from=builder /usr/lib/x86_64-linux-gnu/liblept.so.5 /usr/lib/x86_64-linux-gnu/liblept.so.5
+
+# Copy Python dependencies
+COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code
 COPY . .
 
 # Expose the port
