@@ -7,7 +7,7 @@ services:
       ./setup.sh
     startCommand: |
       source .venv/bin/activate
-      python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+      python -m uvicorn main:app --host 0.0.0.0 --port $PORT --log-level debug
     envVars:
       - key: PYTHON_VERSION
         value: "3.9.18"
@@ -15,6 +15,8 @@ services:
         value: "/usr/bin/tesseract"
       - key: PORT
         value: "8000"
+      - key: BIND
+        value: "0.0.0.0"
     plan: free
     healthCheckPath: /healthz
     autoDeploy: true 
