@@ -1,19 +1,14 @@
-FROM jitesoft/tesseract:4.1.1 as tesseract
-
 FROM python:3.9-slim
 
-# Install system dependencies
+# Install Tesseract and dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    tesseract-ocr \
     libgl1-mesa-glx \
     libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy Tesseract from the pre-built image
-COPY --from=tesseract /usr/bin/tesseract /usr/bin/tesseract
-COPY --from=tesseract /usr/share/tesseract-ocr /usr/share/tesseract-ocr
-COPY --from=tesseract /usr/lib/x86_64-linux-gnu/libtesseract.so.4 /usr/lib/x86_64-linux-gnu/libtesseract.so.4
-COPY --from=tesseract /usr/lib/x86_64-linux-gnu/liblept.so.5 /usr/lib/x86_64-linux-gnu/liblept.so.5
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /var/lib/apt/lists/partial
 
 # Set working directory
 WORKDIR /app
