@@ -1,12 +1,13 @@
 # Build stage
-FROM python:3.9-slim as builder
+FROM python:3.9-alpine as builder
 
 # Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     tesseract-ocr \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    tesseract-ocr-data-eng \
+    build-base \
+    python3-dev \
+    py3-pip
 
 # Set working directory
 WORKDIR /app
@@ -18,15 +19,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Final stage
-FROM python:3.9-slim
+FROM python:3.9-alpine
 
-# Copy Tesseract and dependencies from builder
-COPY --from=builder /usr/bin/tesseract /usr/bin/tesseract
-COPY --from=builder /usr/share/tesseract-ocr /usr/share/tesseract-ocr
-COPY --from=builder /usr/lib/x86_64-linux-gnu/libtesseract.so.4 /usr/lib/x86_64-linux-gnu/libtesseract.so.4
-COPY --from=builder /usr/lib/x86_64-linux-gnu/liblept.so.5 /usr/lib/x86_64-linux-gnu/liblept.so.5
+# Install runtime dependencies
+RUN apk add --no-cache \
+    tesseract-ocr \
+    tesseract-ocr-data-eng
 
-# Copy Python dependencies
+# Copy Python dependencies from builder
 COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
 
 # Set working directory
