@@ -1,11 +1,8 @@
 services:
   - type: web
     name: lab-report-processor
-    env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      wget https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata -O /usr/share/tesseract-ocr/4.00/tessdata/eng.traineddata
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    env: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: PYTHON_VERSION
         value: "3.9.18"
