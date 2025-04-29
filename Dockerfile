@@ -1,13 +1,12 @@
-# Build stage
-FROM python:3.9-alpine as builder
+FROM jitesoft/tesseract:latest as tesseract
 
-# Install build dependencies
-RUN apk add --no-cache \
-    tesseract-ocr \
-    tesseract-ocr-data-eng \
-    build-base \
-    python3-dev \
-    py3-pip
+FROM python:3.9-slim
+
+# Copy Tesseract from the pre-built image
+COPY --from=tesseract /usr/bin/tesseract /usr/bin/tesseract
+COPY --from=tesseract /usr/share/tesseract-ocr /usr/share/tesseract-ocr
+COPY --from=tesseract /usr/lib/x86_64-linux-gnu/libtesseract.so.4 /usr/lib/x86_64-linux-gnu/libtesseract.so.4
+COPY --from=tesseract /usr/lib/x86_64-linux-gnu/liblept.so.5 /usr/lib/x86_64-linux-gnu/liblept.so.5
 
 # Set working directory
 WORKDIR /app
@@ -17,20 +16,6 @@ COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Final stage
-FROM python:3.9-alpine
-
-# Install runtime dependencies
-RUN apk add --no-cache \
-    tesseract-ocr \
-    tesseract-ocr-data-eng
-
-# Copy Python dependencies from builder
-COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
-
-# Set working directory
-WORKDIR /app
 
 # Copy application code
 COPY . .
