@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Install Python dependencies globally
+# Install Python dependencies
 pip install --upgrade pip
-pip install --user -r requirements.txt
+pip install -r requirements.txt
 
 # Install system dependencies
 apt-get update
