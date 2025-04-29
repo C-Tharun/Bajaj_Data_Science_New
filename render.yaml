@@ -8,9 +8,10 @@ services:
         value: "3.9.18"
       - key: TESSERACT_CMD
         value: "/usr/bin/tesseract"
+      - key: PORT
+        value: "8000"
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /healthz
     autoDeploy: true
-    buildCommand: |
-      docker build -t lab-report-processor .
-    startCommand: uvicorn main:app --host 0.0.0.0 --port 8000 
+    buildCommand: docker build -t lab-report-processor .
+    startCommand: docker run -p $PORT:8000 lab-report-processor 
